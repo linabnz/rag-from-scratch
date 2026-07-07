@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from groq import Groq
 
 from config import LLM_MODEL
+from moderator import Moderator
 from vector_db import VectorDB
 
 PROMPT_PATH = "prompts/rag_prompt.txt"
@@ -14,7 +15,7 @@ class RAG:
         load_dotenv()
         self.client = Groq(api_key=os.environ["GROQ_API_KEY"])
         self.vector_db = VectorDB(persist_path=persist_path, chunks=chunks)
-       
+        self.moderator = Moderator()
 
     def _build_system_prompt(self, question):
         with open(PROMPT_PATH, encoding="utf-8") as f:
@@ -25,6 +26,10 @@ class RAG:
         return template.replace("{{Chunks}}", chunks_text)
 
     def answer_question(self, question):
+        moderation = self.moderator.moderate(question)
+        if moderation["is_prompt_injection"]:
+            return "Désolé, je ne peux pas traiter cette question."
+
         system_prompt = self._build_system_prompt(question)
 
         response = self.client.chat.completions.create(
