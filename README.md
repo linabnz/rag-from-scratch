@@ -7,18 +7,18 @@ et un agent modérateur pour filtrer les tentatives de prompt injection.
 
 ## Architecture
 
-- **`vector_db.py`** — classe `VectorDB` : crée ou recharge une base ChromaDB
+- **`vector_db.py`** : classe `VectorDB` : crée ou recharge une base ChromaDB
   persistée, encode les chunks avec `sentence-transformers`, et retrouve les
   chunks les plus proches d'une question.
-- **`moderator.py`** — classe `Moderator` : détecte les tentatives de prompt
+- **`moderator.py`** : classe `Moderator` : détecte les tentatives de prompt
   injection via un modèle Groq dédié (`openai/gpt-oss-safeguard-20b`), et
   retourne `{"is_prompt_injection": true/false}`.
-- **`rag.py`** — classe `RAG` qui orchestre le pipeline complet : modération
+- **`rag.py`** : classe `RAG` qui orchestre le pipeline complet : modération
   de la question, retrieval des chunks pertinents, construction du prompt
   système à trous, appel au LLM Groq (`llama-3.3-70b-versatile`).
-- **`config.py`** — constantes centralisées (noms des modèles d'embedding,
+- **`config.py`** : constantes centralisées (noms des modèles d'embedding,
   de génération et de modération).
-- **`prompts/`** — prompts système en fichiers texte, séparés du code.
+- **`prompts/`** : prompts système en fichiers texte, séparés du code.
 
 
 ## Installation
@@ -72,7 +72,7 @@ de questions, et un bouton permet d'effacer l'historique de conversation.
 **1. Qui intercepte cette entrée, et à quel moment exact du pipeline ?**
 
 `Moderator.moderate()`, appelé en toute première ligne de
-`RAG.answer_question()` — avant tout accès à la base vectorielle et avant
+`RAG.answer_question()` avant tout accès à la base vectorielle et avant
 tout appel au LLM principal. Si `is_prompt_injection` est vrai, un refus est
 renvoyé directement, sans jamais contacter Groq pour la génération.
 
